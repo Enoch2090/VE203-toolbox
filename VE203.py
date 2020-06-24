@@ -23,9 +23,42 @@ def solve_diophantine_eqn(a, b, c):  # The form of ax+by = c
     return
 
 
+def is_square(number_in):
+    is_square = False
+    if int(math.sqrt(number_in))*int(math.sqrt(number_in)) == number_in:
+        is_square = True
+    return is_square
+
+
 def fermat_factorization(number_in, tab_level=0):
-    print(number_in)
-    # TODO: Recursively factorize the number.
+    if number_in < 0:
+        print("Invalid input!")
+        return
+    elif number_in == 1:
+        return
+    else:
+        indent = ("  ") * tab_level
+        print(indent + "Now fatorizing:", number_in)
+        n_1 = math.floor(math.sqrt(number_in))
+        n_2 = n_1 + 1
+        print(indent + "We find", str(n_1)+"² < " +
+              str(number_in)+" < "+str(n_2)+"².")
+        print(indent + "We need to calculate k²−" +
+              str(number_in), "for", str(n_2)+" < k < "+"("+str(number_in)+"+1)/2 = "+str((number_in+1)/2))
+        square_found = False
+        while(not square_found):
+            print(indent + "We find:")
+            remainder = n_2*n_2-number_in
+            if (is_square(remainder)):
+                print(indent + str(n_2) + "² -",
+                      str(number_in), "=", str(remainder), "=", str(
+                          int(math.sqrt(remainder)))+"².")
+                fermat_factorization(int(math.sqrt(remainder)), tab_level+1)
+                return
+            else:
+                print(indent + str(n_2) + "² -",
+                      str(number_in), "=", str(remainder)+",")
+                n_2 += 1
     return
 
 
