@@ -30,33 +30,52 @@ def is_square(number_in):
     return is_square
 
 
-def fermat_factorization(number_in, tab_level=0):
+def is_prime(number_in):
+    is_prime = True
+    if number_in > 1:
+        for i in range(2, number_in//2+1):
+            if (number_in % i) == 0:
+                is_prime = False
+                break
+    return is_prime
+
+
+def fermat_factorization(number_in):
+    indent = "\t"
     if number_in < 0:
         print("Invalid input!")
         return
     elif number_in == 1:
         return
     else:
-        indent = ("  ") * tab_level
-        print(indent + "Now fatorizing:", number_in)
+        print("Now fatorizing:", number_in)
         n_1 = math.floor(math.sqrt(number_in))
         n_2 = n_1 + 1
-        print(indent + "We find", str(n_1)+"² < " +
+        print("We find", str(n_1)+"² < " +
               str(number_in)+" < "+str(n_2)+"².")
-        print(indent + "We need to calculate k²−" +
+        print("We need to calculate k²−" +
               str(number_in), "for", str(n_2)+" < k < "+"("+str(number_in)+"+1)/2 = "+str((number_in+1)/2))
         square_found = False
         while(not square_found):
-            print(indent + "We find:")
+            print(indent+"We find:")
             remainder = n_2*n_2-number_in
             if (is_square(remainder)):
-                print(indent + str(n_2) + "² -",
+                print(indent+str(n_2) + "² -",
                       str(number_in), "=", str(remainder), "=", str(
                           int(math.sqrt(remainder)))+"².")
-                fermat_factorization(int(math.sqrt(remainder)), tab_level+1)
+                print("Therefore", number_in, "=", str(
+                    n_2-int(math.sqrt(remainder))), "×", str(n_2+int(math.sqrt(remainder)))+".")
+                if not is_prime(n_2-int(math.sqrt(remainder))):
+                    print(str(n_2-int(math.sqrt(remainder))),
+                          "is not a prime, continue factorization.")
+                if not is_prime(n_2+int(math.sqrt(remainder))):
+                    print(str(n_2+int(math.sqrt(remainder))),
+                          "is not a prime, continue factorization.")
+                if is_prime(n_2-int(math.sqrt(remainder))) and is_prime(n_2+int(math.sqrt(remainder))):
+                    print("Both are primes.")
                 return
             else:
-                print(indent + str(n_2) + "² -",
+                print(indent+str(n_2) + "² -",
                       str(number_in), "=", str(remainder)+",")
                 n_2 += 1
     return
