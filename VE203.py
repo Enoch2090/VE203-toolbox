@@ -2,6 +2,8 @@ import numpy as np
 import math
 import argparse
 
+# ----------Argument Parsing
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -11,16 +13,7 @@ def parse_args():
         "-ff", "--factorize", nargs=1, help="Fermat factorization.")
     return parser.parse_args()
 
-
-def solve_diophantine_eqn(a, b, c):  # The form of ax+by = c
-    gcd_a_b = math.gcd(a, b)
-    if (c % gcd_a_b) != 0:
-        print("The Diophantine equation "+str(a)+"x + " +
-              str(b)+"y = "+str(c)+"has no solution!")
-    else:
-        pass
-    # TODO: DE
-    return
+# ----------Utilizations
 
 
 def is_square(number_in):
@@ -38,6 +31,63 @@ def is_prime(number_in):
                 is_prime = False
                 break
     return is_prime
+
+
+def find_modular_inverse(a, m):
+    b = 0
+    # Print out the process of finding a modular inverse.
+    # Finding b s.t. a * b === 1 (mod m)
+    [x1, x2] = [a, m]
+    [x1_alias, x2_alias] = [x1, x2]
+    x1_list = [x1]
+    x2_list = [x2]
+    remainder = 0
+    while(remainder != 1):
+        x1 = x2_alias
+        x2 = x1_alias//x2_alias
+        remainder = x1_alias-(x1_alias//x2_alias)*x2_alias
+        [x1_alias, x2_alias] = [x1, x2]
+        x1_list.append(x1)
+        x2_list.append(x2)
+    return b
+
+
+def linear_congruence(a, m, do_print):
+    b = 0
+    # Print out the process of finding a modular inverse.
+    # Finding b s.t. a * b === 1 (mod m)
+    [x1, x2] = [a, m]
+    [x1_alias, x2_alias] = [x1, x2]
+    x1_list = [x1]
+    x2_list = [x2]
+    coeff = []
+    remainder = 100000
+    while(remainder != 0):
+        x1 = x2_alias
+        remainder = x1_alias-(x1_alias//x2_alias)*x2_alias
+        x2 = x1_alias//x2_alias
+        if (do_print):
+            print(str(x1_alias), "=", str(x1_alias//x2_alias),
+                  "×", str(x2_alias), "+", str(remainder))
+        x2 = remainder
+        coeff.append(x1_alias//x2_alias)
+        [x1_alias, x2_alias] = [x1, x2]
+        x1_list.append(x1)
+        x2_list.append(x2)
+    return [x1_list, x2_list, coeff]
+
+# ----------Tool Functions
+
+
+def solve_diophantine_eqn(a, b, c):  # The form of ax+by = c
+    gcd_a_b = math.gcd(a, b)
+    if (c % gcd_a_b) != 0:
+        print("The Diophantine equation "+str(a)+"x + " +
+              str(b)+"y = "+str(c)+"has no solution!")
+    else:
+        pass
+    # TODO: DE
+    return
 
 
 def fermat_factorization(number_in):
@@ -78,6 +128,14 @@ def fermat_factorization(number_in):
                 print(indent+str(n_2) + "² -",
                       str(number_in), "=", str(remainder)+",")
                 n_2 += 1
+    return
+
+
+def chinese_remainder_theorem(x, a_n, m_n):
+    if len(a_n) != len(m_n):
+        print("Invalid input!")
+        return
+
     return
 
 
