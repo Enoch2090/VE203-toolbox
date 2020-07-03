@@ -52,11 +52,7 @@ def find_modular_inverse(a, m):
     return b
 
 
-def linear_congruence(a, m, do_print):
-    b = 0
-    # Print out the process of finding a modular inverse.
-    # Finding b s.t. a * b === 1 (mod m)
-    [x1, x2] = [a, m]
+def linear_congruence(x1, x2, do_print):
     [x1_alias, x2_alias] = [x1, x2]
     x1_list = [x1]
     x2_list = [x2]
@@ -75,6 +71,7 @@ def linear_congruence(a, m, do_print):
         x1_list.append(x1)
         x2_list.append(x2)
     return [x1_list, x2_list, coeff]
+
 
 # ----------Tool Functions
 
