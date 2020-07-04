@@ -78,18 +78,27 @@ def linear_congruence(x1, x2, do_print):
 
 def eulidian(a, b, do_print):  # YES I AM F**KING LAZY
     # Gives an solution to  ax + by = 1
-    r = requests.post('https://www.math.uwaterloo.ca/~snburris/cgi-bin/linear-query',
-                      data={'coeff1': a, 'coeff2': b, 'coeff': 1, 'data': "Solve It"})
-    soup = BeautifulSoup(r.text)
-    text = soup.get_text().replace("\n\n", "\n").replace("Thoralf Responds", "") + \
-        "\nRetrieved from https://www.math.uwaterloo.ca/~snburris/htdocs/linear.html\n"
-
+    x0, y0 = 0, 0
     if do_print:
+        r = requests.post('https://www.math.uwaterloo.ca/~snburris/cgi-bin/linear-query',
+                          data={'coeff1': a, 'coeff2': b, 'coeff': 1, 'data': "Solve It"})
+        soup = BeautifulSoup(r.text)
+        text = soup.get_text().replace("\n\n", "\n").replace("Thoralf Responds", "") + \
+            "\nRetrieved from https://www.math.uwaterloo.ca/~snburris/htdocs/linear.html\n"
+
         print(text)
-    patternx = re.compile(r'(?<=x0 = )([+-]?[1-9]\d*|0)')
-    x0 = int(patternx.findall(text)[0])
-    patterny = re.compile(r'(?<=y0 = )([+-]?[1-9]\d*|0)')
-    y0 = int(patterny.findall(text)[0])
+        patternx = re.compile(r'(?<=x0 = )([+-]?[1-9]\d*|0)')
+        x0 = int(patternx.findall(text)[0])
+        patterny = re.compile(r'(?<=y0 = )([+-]?[1-9]\d*|0)')
+        y0 = int(patterny.findall(text)[0])
+    else:
+        x0, x = 1, 0
+        y0, y = 0, 1
+        while b:
+            q = a//b
+            x, x0 = x0 - q*x, x
+            y, y0 = y0 - q*y, y
+            a, b = b, a % b
     return [x0, y0]
 
 # ----------Tool Functions
