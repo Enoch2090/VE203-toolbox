@@ -14,6 +14,10 @@ def parse_args():
         "-dio", "--diophantine", nargs=3, help="Solve a Diophantine equation.")
     parser.add_argument(
         "-ff", "--factorize", nargs=1, help="Fermat factorization.")
+    parser.add_argument(
+        "-gcd", "--greatcommondivisor", nargs=2, help="Great common divisor.")
+    parser.add_argument(
+        "-euc", "--euclidian", nargs=3, help="Find the solution to the extended Euclidian algorithm.")
     return parser.parse_args()
 
 # ----------Utilizations
@@ -76,7 +80,7 @@ def linear_congruence(x1, x2, do_print):
     return [x1_list, x2_list, coeff]
 
 
-def eulidian(a, b, do_print):  # YES I AM F**KING LAZY
+def euclidian(a, b, do_print):  # YES I AM F**KING LAZY
     # Gives an solution to  ax + by = 1
     x0, y0 = 0, 0
     if do_print:
@@ -102,6 +106,12 @@ def eulidian(a, b, do_print):  # YES I AM F**KING LAZY
     return [x0, y0]
 
 # ----------Tool Functions
+
+
+def gcd_a_b(a, b):
+    [x1_list, x2_list, coeff] = linear_congruence(a, b, True)
+    print("Therefore gcd of", str(a), "and", str(b), "is", str(x2_list[-2]))
+    return
 
 
 def solve_diophantine_eqn(a, b, c):  # The form of ax+by = c
@@ -160,7 +170,6 @@ def chinese_remainder_theorem(x, a_n, m_n):
     if len(a_n) != len(m_n):
         print("Invalid input!")
         return
-
     return
 
 
@@ -171,14 +180,21 @@ if __name__ == "__main__":
             args.diophantine[1]), int(args.diophantine[2]))
     elif args.factorize != None:
         fermat_factorization(int(args.factorize[0]))
+    elif args.greatcommondivisor != None:
+        gcd_a_b(int(args.greatcommondivisor[0]), int(
+            args.greatcommondivisor[1]))
+    elif args.euclidian != None:
+        euclidian(int(args.euclidian[0]), int(
+            args.euclidian[1]), True)
     else:
         while(1):
-            cmd = input('Enter command:\n')
-            cmd.split(" ")
+            cmd = input('\nEnter command:\n')
+            cmd = cmd.split(" ")
             if cmd[0] == "exit":
                 break
             elif (cmd[0] == "dio") | (cmd[0] == "diophantine"):
                 try:
+                    print("YAY")
                     solve_diophantine_eqn(
                         int(cmd[1]), int(cmd[2]), int(cmd[3]))
                 except IndexError:
@@ -186,6 +202,16 @@ if __name__ == "__main__":
             elif (cmd[0] == "ff") | (cmd[0] == "factorize"):
                 try:
                     fermat_factorization(int(cmd[1]))
+                except IndexError:
+                    print("Argument numbers invalid!")
+            elif (cmd[0] == "gcd") | (cmd[0] == "greatcommondivisor"):
+                try:
+                    gcd_a_b(int(cmd[1]), int(cmd[2]))
+                except IndexError:
+                    print("Argument numbers invalid!")
+            elif (cmd[0] == "euc") | (cmd[0] == "euclidian"):
+                try:
+                    euclidian(int(cmd[1]), int(cmd[2]), True)
                 except IndexError:
                     print("Argument numbers invalid!")
             else:
