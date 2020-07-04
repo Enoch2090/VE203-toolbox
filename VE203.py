@@ -4,6 +4,7 @@ import argparse
 import requests
 import re
 from bs4 import BeautifulSoup
+from functools import reduce
 
 # ----------Argument Parsing
 
@@ -120,8 +121,18 @@ def solve_diophantine_eqn(a, b, c):  # The form of ax+by = c
         print("The Diophantine equation "+str(a)+"x + " +
               str(b)+"y = "+str(c)+"has no solution!")
     else:
-        pass
     # TODO: DE
+        r = requests.post('https://www.math.uwaterloo.ca/~snburris/cgi-bin/linear-query',
+                          data={'coeff1': a, 'coeff2': b, 'coeff': c, 'data': "Solve It"})
+        soup = BeautifulSoup(r.text)
+        text = soup.get_text().replace("\n\n", "\n").replace("Thoralf Responds", "") + \
+            "\nRetrieved from https://www.math.uwaterloo.ca/~snburris/htdocs/linear.html\n"
+
+        print(text)
+        patternx = re.compile(r'(?<=x0 = )([+-]?[1-9]\d*|0)')
+        x0 = int(patternx.findall(text)[0])
+        patterny = re.compile(r'(?<=y0 = )([+-]?[1-9]\d*|0)')
+        y0 = int(patterny.findall(text)[0])
     return
 
 
@@ -165,12 +176,34 @@ def fermat_factorization(number_in):
                 n_2 += 1
     return
 
+def mul_inv(a, b):
+    b0 = b
+    x0, x1 = 0, 1
+    if b == 1: return 1
+    while a > 1:
+        q = a // b
+        a, b = b, a%b
+        x0, x1 = x1 - q * x0, x0
+    if x1 < 0: x1 += b0
+    return x1
 
-def chinese_remainder_theorem(x, a_n, m_n):
-    if len(a_n) != len(m_n):
+def chinese_remainder_theorem(n,a):
+    if len(n) != len(a):
         print("Invalid input!")
         return
-    return
+    else:
+        sum = 0
+        prod = reduce(lambda a, b: a*b, n)
+        print("M = ", prod, sep="")
+        i=1
+        for n_i, a_i in zip(n, a):
+            p = prod // n_i
+            inv=mul_inv(p, n_i)
+            print("M[", i, "] = ", p, sep="", end="; ")
+            print("y[", i, "] = ", inv, sep="", end="\n")
+            sum += a_i * inv * p
+            ++i
+        print("x = ", sum, " mod ", prod, sep="")
 
 
 if __name__ == "__main__":
