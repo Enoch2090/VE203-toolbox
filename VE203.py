@@ -1,6 +1,9 @@
 import numpy as np
 import math
 import argparse
+import requests
+import re
+from bs4 import BeautifulSoup
 
 # ----------Argument Parsing
 
@@ -72,6 +75,22 @@ def linear_congruence(x1, x2, do_print):
         x2_list.append(x2)
     return [x1_list, x2_list, coeff]
 
+
+def eulidian(a, b, do_print):  # YES I AM F**KING LAZY
+    # Gives an solution to  ax + by = 1
+    r = requests.post('https://www.math.uwaterloo.ca/~snburris/cgi-bin/linear-query',
+                      data={'coeff1': a, 'coeff2': b, 'coeff': 1, 'data': "Solve It"})
+    soup = BeautifulSoup(r.text)
+    text = soup.get_text().replace("\n\n", "\n").replace("Thoralf Responds", "") + \
+        "\nRetrieved from https://www.math.uwaterloo.ca/~snburris/htdocs/linear.html\n"
+
+    if do_print:
+        print(text)
+    patternx = re.compile(r'(?<=x0 = )([+-]?[1-9]\d*|0)')
+    x0 = int(patternx.findall(text)[0])
+    patterny = re.compile(r'(?<=y0 = )([+-]?[1-9]\d*|0)')
+    y0 = int(patterny.findall(text)[0])
+    return [x0, y0]
 
 # ----------Tool Functions
 
