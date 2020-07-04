@@ -9,6 +9,20 @@ from functools import reduce
 # ----------Argument Parsing
 
 
+def chinese_remainder_theorem_input(num):
+    all_coeff = []
+    print("To solve the system x[n] ≡ a[n] mod m[n], use")
+    print("coefficient input form: a[n] m[n]")
+    for i in range(num):
+        coeff_array = input(
+            '\nEnter coefficients for eqn ' + str(i+1)+': \n').split(" ")
+        coeff = list(map(int, coeff_array))
+        all_coeff.append(coeff)
+    all_coeff = list(map(list, zip(*all_coeff)))
+    chinese_remainder_theorem(all_coeff[0], all_coeff[1])
+    return
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -19,6 +33,8 @@ def parse_args():
         "-gcd", "--greatcommondivisor", nargs=2, help="Great common divisor.")
     parser.add_argument(
         "-euc", "--euclidian", nargs=3, help="Find the solution to the extended Euclidian algorithm.")
+    parser.add_argument(
+        "-crt", "--chineseremainder", nargs=1, help="Give a particular set of solution with the Chinese remainder theorem.")
     return parser.parse_args()
 
 # ----------Utilizations
@@ -39,6 +55,20 @@ def is_prime(number_in):
                 is_prime = False
                 break
     return is_prime
+
+
+def mul_inv(a, b):
+    b0 = b
+    x0, x1 = 0, 1
+    if b == 1:
+        return 1
+    while a > 1:
+        q = a // b
+        a, b = b, a % b
+        x0, x1 = x1 - q * x0, x0
+    if x1 < 0:
+        x1 += b0
+    return x1
 
 
 def find_modular_inverse(a, m):
@@ -104,6 +134,8 @@ def euclidian(a, b, do_print):  # YES I AM F**KING LAZY
             x, x0 = x0 - q*x, x
             y, y0 = y0 - q*y, y
             a, b = b, a % b
+        print("x₀ =", x0)
+        print("y₀ =", y0)
     return [x0, y0]
 
 # ----------Tool Functions
@@ -121,7 +153,7 @@ def solve_diophantine_eqn(a, b, c):  # The form of ax+by = c
         print("The Diophantine equation "+str(a)+"x + " +
               str(b)+"y = "+str(c)+"has no solution!")
     else:
-    # TODO: DE
+        # TODO: DE
         r = requests.post('https://www.math.uwaterloo.ca/~snburris/cgi-bin/linear-query',
                           data={'coeff1': a, 'coeff2': b, 'coeff': c, 'data': "Solve It"})
         soup = BeautifulSoup(r.text)
@@ -176,18 +208,8 @@ def fermat_factorization(number_in):
                 n_2 += 1
     return
 
-def mul_inv(a, b):
-    b0 = b
-    x0, x1 = 0, 1
-    if b == 1: return 1
-    while a > 1:
-        q = a // b
-        a, b = b, a%b
-        x0, x1 = x1 - q * x0, x0
-    if x1 < 0: x1 += b0
-    return x1
 
-def chinese_remainder_theorem(n,a):
+def chinese_remainder_theorem(a, n):
     if len(n) != len(a):
         print("Invalid input!")
         return
@@ -195,15 +217,18 @@ def chinese_remainder_theorem(n,a):
         sum = 0
         prod = reduce(lambda a, b: a*b, n)
         print("M = ", prod, sep="")
-        i=1
+        i = 1
         for n_i, a_i in zip(n, a):
             p = prod // n_i
-            inv=mul_inv(p, n_i)
+            inv = mul_inv(p, n_i)
             print("M[", i, "] = ", p, sep="", end="; ")
             print("y[", i, "] = ", inv, sep="", end="\n")
             sum += a_i * inv * p
             ++i
         print("x = ", sum, " mod ", prod, sep="")
+        print("To check the calculation of each modular inverse, rerun using")
+        print("-euc M[n] m[n]")
+    return
 
 
 if __name__ == "__main__":
@@ -218,7 +243,9 @@ if __name__ == "__main__":
             args.greatcommondivisor[1]))
     elif args.euclidian != None:
         euclidian(int(args.euclidian[0]), int(
-            args.euclidian[1]), True)
+            args.euclidian[1]), bool(int(args.euclidian[2])))
+    elif args.chineseremainder != None:
+        chinese_remainder_theorem_input(int(args.chineseremainder[0]))
     else:
         while(1):
             cmd = input('\nEnter command:\n')
@@ -227,7 +254,6 @@ if __name__ == "__main__":
                 break
             elif (cmd[0] == "dio") | (cmd[0] == "diophantine"):
                 try:
-                    print("YAY")
                     solve_diophantine_eqn(
                         int(cmd[1]), int(cmd[2]), int(cmd[3]))
                 except IndexError:
@@ -244,7 +270,12 @@ if __name__ == "__main__":
                     print("Argument numbers invalid!")
             elif (cmd[0] == "euc") | (cmd[0] == "euclidian"):
                 try:
-                    euclidian(int(cmd[1]), int(cmd[2]), True)
+                    euclidian(int(cmd[1]), int(cmd[2]), bool(int(cmd[3])))
+                except IndexError:
+                    print("Argument numbers invalid!")
+            elif (cmd[0] == "crt") | (cmd[0] == "chineseremainder"):
+                try:
+                    chinese_remainder_theorem_input(int(cmd[1]))
                 except IndexError:
                     print("Argument numbers invalid!")
             else:
