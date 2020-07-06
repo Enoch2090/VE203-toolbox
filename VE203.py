@@ -224,7 +224,7 @@ def chinese_remainder_theorem(a, n):
             print("M[", i, "] = ", p, sep="", end="; ")
             print("y[", i, "] = ", inv, sep="", end="\n")
             sum += a_i * inv * p
-            ++i
+            i += 1
         print("x = ", sum, " mod ", prod, sep="")
         print("To check the calculation of each modular inverse, rerun using")
         print("-euc M[n] m[n]")
